@@ -1,11 +1,10 @@
 #!/usr/bin/python
 import math, sys, os, time
 
+
 #chmod +x manage.py
 
-
-sudoPassword = '6RS'
-chuckCalibrateCommand = 'chuck checkCalibration --update-off'
+chuckCalibrateCommand = 'chuck checkCalibration --update-on'
 chuckReboot = 'sudo reboot'
 
 chargeDistance = 1.65 #Added distance to account for distance to perform the Charging command
@@ -13,9 +12,6 @@ chargeDistance = 1.65 #Added distance to account for distance to perform the Cha
 xInput = sys.argv[1] #Input value for x-coordinate for the charger from the GRM
 yInput = sys.argv[2] #Input value for y-coordinate for the charger from the GRM
 tInput = sys.argv[3] #Input value for orientation for the charger from the GRM
-print(xInput)
-print(yInput)
-print(tInput)
 
 chargeAngle = float(tInput) + 90 #GRM specifies angle 90 degrees diffeent from what the Chuck move command use
 
@@ -29,27 +25,20 @@ yAdd = math.cos(theta)*chargeDistance*(-1)
 newX = float(xInput) + xAdd
 newY = float(yInput) + yAdd
 
-
-print(newX)
-print(newY)
-
-print(chargeAngle)
-
 chuckMoveCommand = 'chuck move --x {} --y {} --theta {}'.format(newX,newY,chargeAngle)
-
-print(chuckMoveCommand)
 
 
 #Call bash command to move the Chuck to the correct location in fron of the Charger 
-#os.system('echo %s|sudo -S %s' % (sudoPassword, chuckMoveCommand))
+print("Sending Chuck to charger for calibration...")
+time.sleep(3)
 os.system(chuckMoveCommand)
 
 
 print("Preparing to start Calibration...")
+
 time.sleep(3)
 
 #Call the command to run the calibration on the Chuck
-#os.system('echo %s|sudo -S %s' % (sudoPassword, chuckCalibrateCommand))
 os.system(chuckCalibrateCommand)
 time.sleep(1)
 
@@ -57,12 +46,9 @@ time.sleep(1)
 rebootQuestion = None
 while rebootQuestion not in ("y", "n"):
 	rebootQuestion = raw_input("Calibration is done, do you want to reboot Chuck? (Y/N)\n").lower().strip()
-	print(rebootQuestion)
 	if rebootQuestion[0] == "y":
-		print(sudoPassword)
 		print("Rebooting Chuck...")
 		time.sleep(1)
-		#os.system('echo %s|sudo -S %s' % (sudoPassword, chuckReboot))
 		os.system(chuckReboot)
 	elif rebootQuestion[0] == "n":
 		print("Exiting Calibration tool...")
